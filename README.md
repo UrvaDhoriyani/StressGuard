@@ -327,13 +327,7 @@ Based on the research roadmap:
 
 ---
 
-## 📝 License
-
-This project is part of academic research at Columbia University. Please contact the authors for licensing inquiries.
-
----
-
-## 👥 Contributors
+##  Contributors
 
 **Arpita Hage** (ah4384)
 - Physiological signal analysis
@@ -347,22 +341,12 @@ This project is part of academic research at Columbia University. Please contact
 
 ---
 
-## 📧 Contact & Support
+## 📧 Contact
 
 For questions or issues:
 - 📨 Email: [ah4384@columbia.edu](mailto:ah4384@columbia.edu) or [ud2142@columbia.edu](mailto:ud2142@columbia.edu)
-- 🔗 GitHub: [StressGuard Repository](https://github.com/yourusername/StressGuard)
-
----
-
-## 🙏 Acknowledgments
-
-- **Columbia University** for computational resources
-- **WESAD Dataset** researchers for the benchmark dataset
-- **Embedded AI '26** conference organizers
 
 ---
 
 **Last Updated:** May 2026  
-**Version:** 1.0  
-**Status:** Active Development
+**Version:** 1.0
