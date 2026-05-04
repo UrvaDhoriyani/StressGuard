@@ -75,10 +75,9 @@ StressGuard follows a three-layer pipeline:
 - **Modular pipeline**: Easy debugging and scaling
 
 ### 3.3 Output Layer
-- **Terminal GUI**: Real-time display of BPM, temperature, RMSSD
-- **Color-coded alerts**: Visual notification of stress state changes
-- **Local CSV logging**: Timestamped records for trend analysis
-- **Future enhancement**: Tkinter-based GUI with wellness tips
+- **Terminal Interface**: Real-time display of BPM, temperature, and RMSSD
+- **Color-coded alerts**: Visual notification of stress vs. normal states
+- **Local CSV logging**: Timestamped records for long-term trend analysis
 
 ---
 
@@ -177,54 +176,26 @@ Per-Fold Performance:
 
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Setup & Installation
 
 ### Prerequisites
 - **Hardware**:
-  - Raspberry Pi 5 (8GB recommended)
+  - Raspberry Pi 5 (8GB)
   - MAX30102 PPG sensor module
   - I2C connectors and cables
-  - Optional: MLX90614 thermal sensor
 
 - **Software**:
   - Python 3.8+
-  - pip package manager
+  - Dependencies: numpy, pandas, scipy, scikit-learn, xgboost, imbalanced-learn, joblib, neurokit2
 
-### Step 1: Clone Repository
+### Installation
 ```bash
+# Clone the repository
 git clone https://github.com/yourusername/StressGuard.git
 cd StressGuard
-```
 
-### Step 2: Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-**Key Dependencies:**
-- `numpy`, `pandas`, `scipy`: Numerical and signal processing
-- `scikit-learn`: ML pipeline and metrics
-- `xgboost`: XGBoost classifier
-- `imbalanced-learn`: SMOTE implementation
-- `joblib`: Model serialization
-- `neurokit2`: Advanced HRV analysis
-- `smbus-cffi`: I2C communication (Raspberry Pi)
-
-### Step 3: Prepare Data (Optional for Training)
-```bash
-# Extract WESAD dataset features
-python extract_features.py
-
-# Train XGBoost model with SMOTE
-python train_xgboost.py
-
-# Evaluate performance
-python train_model.py
-```
-
-### Step 4: Run Live Monitoring
-```bash
-python live_monitor.py
+# Install dependencies
+pip install numpy pandas scipy scikit-learn xgboost imbalanced-learn joblib neurokit2
 ```
 
 ---
@@ -233,86 +204,71 @@ python live_monitor.py
 
 ```
 StressGuard/
-├── README.md                          # This file
+├── README.md                          # Project documentation
 ├── live_monitor.py                    # Real-time stress monitoring on Raspberry Pi
 ├── extract_features.py                # HRV feature extraction from WESAD
-├── extract_features_ecg.py            # ECG-based feature extraction (alternate)
-├── train_model.py                     # Model training & evaluation
-├── train_xgboost.py                   # XGBoost training with SMOTE
+├── train_model.py                     # Model training & evaluation with multiple classifiers
+├── train_xgboost.py                   # XGBoost training with SMOTE optimization
 ├── evaluate_xgb_full.py               # Comprehensive XGBoost evaluation
 ├── diagnose_features.py               # Feature analysis and diagnostics
-├── inspect_pickle.py                  # Utility to inspect WESAD pickle files
-├── led_test.py                        # Hardware testing for LED control
+├── inspect_pickle.py                  # Utility to inspect WESAD dataset format
+├── led_test.py                        # Hardware sensor testing
 │
 ├── stress_model.joblib                # Trained Logistic Regression model
 ├── stress_model_xgb.joblib            # Trained XGBoost model (recommended)
 ├── stress_model_binary.joblib         # Binary classification model
 │
 ├── hrv_features.csv                   # Extracted HRV features from WESAD
-├── hrv_features_ecg.csv               # ECG-based HRV features
 │
-├── evaluation_final.txt               # Final XGBoost LOSO-CV results
-├── evaluation_final_ecg.txt           # ECG evaluation results
-├── training_results_v2.txt            # Historical training logs
-├── training_results_v3.txt            # Historical training logs
+├── evaluation_final.txt               # Final model evaluation results
+├── training_results_v2.txt            # Training logs
+├── training_results_v3.txt            # Training logs
 ├── xgb_smote_results.txt              # SMOTE optimization results
 │
-├── data/
-│   └── WESAD/                         # WESAD dataset (15 subjects)
-│       ├── S2/, S3/, ..., S17/        # Subject folders (S12 excluded)
-│       │   ├── [Subject]_quest.csv    # Questionnaire responses
-│       │   ├── [Subject]_readme.txt   # Subject metadata
-│       │   └── [Subject]_respiban.txt # ReSPerate band data
-│       └── ...
-│
-└── extract_features.py.save           # Backup of feature extraction script
+└── data/
+    └── WESAD/                         # WESAD dataset (15 subjects: S2-S11, S13-S17)
+        ├── S2/, S3/, ..., S17/
+        │   ├── [Subject]_quest.csv
+        │   ├── [Subject]_readme.txt
+        │   └── [Subject]_respiban.txt
+        └── ...
 ```
 
 ---
 
 ## 🚀 Usage
 
-### Live Monitoring (Raspberry Pi)
+### 1. Live Monitoring on Raspberry Pi
 ```bash
 python live_monitor.py
 ```
+Runs real-time stress detection with live terminal output showing BPM, temperature, RMSSD, and stress classification.
 
-**Output Example:**
-```
---- STRESSGUARD LIVE MONITOR ---
-Place your finger gently on the red sensor.
-Collecting baseline data...
-
-[T=15s] Window complete
-├── Pulse: 72 BPM
-├── Board Temp: 45.2°C
-├── RMSSD: 28.5 ms
-└── Status: ✓ NORMAL
-
-[T=30s] Window complete
-├── Pulse: 88 BPM
-├── Board Temp: 45.8°C
-├── RMSSD: 12.3 ms
-└── Status: ⚠ STRESS ALERT
-```
-
-### Feature Extraction
+### 2. Feature Extraction
 ```bash
 python extract_features.py
-# Outputs: hrv_features.csv with 14 HRV metrics per window
 ```
+Extracts 14 HRV features from WESAD dataset pickle files and saves to `hrv_features.csv`.
 
-### Model Training
+### 3. Model Training & Evaluation
 ```bash
+# Train XGBoost with SMOTE and evaluate via LOSO-CV
 python train_xgboost.py
-# Trains XGBoost with SMOTE and evaluates via LOSO-CV
-# Outputs: stress_model_xgb.joblib
+
+# Train multiple models (Logistic Regression, Random Forest, SVM, XGBoost) and evaluate
+python train_model.py
 ```
 
-### Evaluation
+### 4. Model Analysis
 ```bash
-python train_model.py
-# Comprehensive evaluation with multiple classifiers
+# Comprehensive XGBoost evaluation
+python evaluate_xgb_full.py
+
+# Feature importance diagnostics
+python diagnose_features.py
+
+# Inspect WESAD dataset format
+python inspect_pickle.py
 ```
 
 ---
@@ -356,14 +312,9 @@ Calculations via Fast Fourier Transform (FFT) for real-time efficiency.
 
 ## 🔮 Future Enhancements
 
-1. **Multi-Modal Integration**: EDA (Electrodermal Activity) sensor support
-2. **Mobile Dashboard**: Real-time data synchronization to smartphone app
-3. **Enhanced UI**: Tkinter-based GUI with wellness recommendations
-4. **Extended Datasets**: Model retraining on additional populations
-5. **Cloud Sync (Optional)**: Privacy-preserving cloud backup option
-6. **Custom Thresholds**: Per-user baseline calibration
-7. **Breathing Exercises**: Guided interventions triggered by stress detection
-8. **Historical Analytics**: Trend visualization and pattern recognition
+Based on the research roadmap:
+1. **Multi-Modal Integration**: Electrodermal Activity (EDA) sensor support
+2. **Mobile Synchronization**: Data sync with mobile devices
 
 ---
 
