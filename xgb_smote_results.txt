@@ -1,0 +1,10 @@
+############################################################
+# BINARY (stress vs non-stress) — LOSO-CV (XGBoost + SMOTE)
+############################################################
+XGBoost + SMOTE LOSO-CV Accuracy: 0.7656 ± 0.1114
+XGBoost + SMOTE LOSO-CV F1-Score: 0.6666
+
+############################################################
+# FINAL MODEL (trained on all data, for Pi deployment)
+############################################################
+Saved stress_model_xgb.joblib

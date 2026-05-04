@@ -1,0 +1,54 @@
+Using features: ['MeanNN', 'SDNN', 'RMSSD', 'pNN50', 'pNN20', 'MedianNN', 'IQRNN', 'CVNN', 'MinNN', 'MaxNN', 'HR_mean', 'LF', 'HF', 'LF_HF']
+
+############################################################
+# 3-CLASS (baseline / amusement / stress) — LOSO-CV with per-subject normalization
+############################################################
+
+Random Forest LOSO-CV:       0.6691 ± 0.0773
+Logistic Regression LOSO-CV: 0.5195 ± 0.0728
+SVM LOSO-CV:                 0.6046 ± 0.0953
+
+############################################################
+# BINARY (stress vs non-stress) — LOSO-CV with per-subject normalization
+############################################################
+
+Random Forest:       acc=0.7895 ± 0.0620, F1=0.6018
+Logistic Regression: acc=0.7463 ± 0.0741, F1=0.6240
+SVM:                 acc=0.7739 ± 0.0683, F1=0.6798
+
+############################################################
+# FINAL MODEL (trained on all data, for Pi deployment)
+############################################################
+
+Held-out test (single split): acc=0.6454
+              precision    recall  f1-score   support
+
+   amusement       0.29      0.03      0.06       115
+    baseline       0.66      0.83      0.73       378
+      stress       0.64      0.66      0.65       212
+
+    accuracy                           0.65       705
+   macro avg       0.53      0.51      0.48       705
+weighted avg       0.59      0.65      0.60       705
+
+
+FEATURE IMPORTANCE:
+  MedianNN   0.1168
+  CVNN       0.0903
+  pNN50      0.0868
+  IQRNN      0.0841
+  pNN20      0.0837
+  MeanNN     0.0773
+  HR_mean    0.0711
+  MinNN      0.0672
+  MaxNN      0.0618
+  SDNN       0.0584
+  RMSSD      0.0552
+  LF_HF      0.0512
+  HF         0.0492
+  LF         0.0470
+
+Saved confusion_matrix.png
+Saved feature_importance.png
+Saved stress_model.joblib
+Saved stress_model_binary.joblib

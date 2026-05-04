@@ -1,0 +1,63 @@
+import pickle
+import numpy as np
+import pandas as pd
+import neurokit2 as nk
+from pathlib import Path
+
+# All subjects in WESAD except S12 (missing from dataset)
+SUBJECTS = [f"S{i}" for i in range(2, 18) if i != 12]
+DATA_DIR = Path("data/WESAD")
+LABEL_MAP = {1: "baseline", 2: "stress", 3: "amusement"}
+
+records = []
+for subj in SUBJECTS:
+    path = DATA_DIR / subj / f"{subj}.pkl"
+    if not path.exists():
+        print(f"Skipping {subj}, file not found at {path}")
+        continue
+    print(f"Processing {subj}...")
+    
+    with open(path, "rb") as f:
+        d = pickle.load(f, encoding="latin1")
+    
+    bvp = d["signal"]["wrist"]["BVP"].flatten()   # 64 Hz BVP from wrist Empatica E4
+    labels = d["label"].flatten()                 # 700 Hz labels
+    
+    # Downsample labels to 64 Hz to match BVP
+    label_ratio = len(labels) // len(bvp)
+    labels_ds = labels[::label_ratio][:len(bvp)]
+    
+    WIN_SEC = 30
+    STEP_SEC = 5
+    WIN = 64 * WIN_SEC      # 30-sec window at 64 Hz
+    STEP = 64 * STEP_SEC    # 5-sec stride
+    
+    for start in range(0, len(bvp) - WIN, STEP):
+        seg = bvp[start:start + WIN]
+        lbl_seg = labels_ds[start:start + WIN]
+        valid = lbl_seg[np.isin(lbl_seg, list(LABEL_MAP.keys()))]
+        if len(valid) == 0:
+            continue
+        lbl = int(np.bincount(valid).argmax())
+        try:
+            signals, _ = nk.ppg_process(seg, sampling_rate=64)
+            hrv_t = nk.hrv_time(signals, sampling_rate=64, show=False)
+            hrv_f = nk.hrv_frequency(signals, sampling_rate=64, show=False)
+            records.append({
+                "subject": subj,
+                "label":   LABEL_MAP[lbl],
+                "RMSSD":   hrv_t["HRV_RMSSD"].values[0],
+                "SDNN":    hrv_t["HRV_SDNN"].values[0],
+                "pNN50":   hrv_t["HRV_pNN50"].values[0],
+                "MeanNN":  hrv_t["HRV_MeanNN"].values[0],
+                "LF_HF":   hrv_f["HRV_LFHF"].values[0],
+            })
+        except Exception as e:
+            # Feature extraction sometimes fails on low-quality segments
+            continue
+
+df = pd.DataFrame(records).dropna()
+df.to_csv("hrv_features.csv", index=False)
+print(f"\nSaved {len(df)} windows across {df.subject.nunique()} subjects")
+print("\nLabel distribution:")
+print(df["label"].value_counts())

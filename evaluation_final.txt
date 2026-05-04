@@ -1,0 +1,85 @@
+Dataset: 3522 windows from 15 subjects
+Class balance: stress=1055 (30.0%), non-stress=2467
+
+############################################################
+# XGBoost + SMOTE — BINARY LOSO-CV
+############################################################
+  Fold  1 (S10): acc=0.4239, F1=0.3913
+  Fold  2 (S11): acc=0.7848, F1=0.7018
+  Fold  3 (S13): acc=0.7426, F1=0.6839
+  Fold  4 (S14): acc=0.8213, F1=0.7342
+  Fold  5 (S15): acc=0.6653, F1=0.6184
+  Fold  6 (S16): acc=0.8390, F1=0.7654
+  Fold  7 (S17): acc=0.7975, F1=0.7263
+  Fold  8 (S2): acc=0.7422, F1=0.6027
+  Fold  9 (S3): acc=0.6609, F1=0.5357
+  Fold 10 (S4): acc=0.8603, F1=0.7377
+  Fold 11 (S5): acc=0.8347, F1=0.7719
+  Fold 12 (S6): acc=0.8412, F1=0.7087
+  Fold 13 (S7): acc=0.8846, F1=0.8323
+  Fold 14 (S8): acc=0.8255, F1=0.7172
+  Fold 15 (S9): acc=0.7607, F1=0.4717
+
+XGBoost + SMOTE LOSO:  acc=0.7656 ± 0.1114, F1=0.6666
+
+Aggregated classification report (XGBoost):
+              precision    recall  f1-score   support
+
+  non-stress     0.8846    0.7641    0.8199      2467
+      stress     0.5816    0.7668    0.6615      1055
+
+    accuracy                         0.7649      3522
+   macro avg     0.7331    0.7655    0.7407      3522
+weighted avg     0.7938    0.7649    0.7725      3522
+
+Confusion matrix (XGBoost, aggregated across folds):
+                 pred non-stress  pred stress
+true non-stress             1885          582
+true stress                  246          809
+
+############################################################
+# BASELINE MODELS — BINARY LOSO-CV
+############################################################
+Random Forest:       acc=0.7748 ± 0.1147, F1=0.6788
+Logistic Regression: acc=0.7807 ± 0.0675, F1=0.6877
+SVM (RBF):           acc=0.7544 ± 0.0800, F1=0.6577
+
+Saved xgb_confusion_matrix.png
+Saved xgb_confusion_matrix_normalized.png
+
+############################################################
+# FEATURE IMPORTANCE (XGBoost)
+############################################################
+  CVNN       0.2585
+  HR_mean    0.1001
+  MedianNN   0.0925
+  IQRNN      0.0910
+  MeanNN     0.0724
+  pNN50      0.0704
+  pNN20      0.0702
+  MinNN      0.0457
+  MaxNN      0.0408
+  RMSSD      0.0403
+  SDNN       0.0398
+  HF         0.0299
+  LF_HF      0.0242
+  LF         0.0242
+
+Saved xgb_feature_importance.png
+Saved stress_model_xgb.joblib
+
+############################################################
+# SUMMARY FOR FINAL REPORT
+############################################################
+Dataset:            WESAD, 3522 windows across 15 subjects
+Features:           14 HRV features (time + frequency domain)
+Task:               Binary classification (stress vs non-stress)
+Validation:         Leave-One-Subject-Out cross-validation (15 folds)
+Class balancing:    SMOTE (training folds only)
+
+XGBoost + SMOTE:    acc=0.7656 ± 0.1114, F1=0.6666
+Random Forest:      acc=0.7748 ± 0.1147, F1=0.6788
+SVM (RBF):          acc=0.7544 ± 0.0800, F1=0.6577
+Logistic Reg:       acc=0.7807 ± 0.0675, F1=0.6877
+
+Top 3 features: ['CVNN', 'HR_mean', 'MedianNN']
